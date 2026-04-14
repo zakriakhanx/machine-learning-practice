@@ -41,7 +41,7 @@ heart_df.nunique()
 # ========================= CATEGORICAL ENCODING =========================
 
 # Identify columns with object (string) data type
-cat_col = heart_df.select_dtypes(include=['object']).columns
+cat_col = heart_df.select_dtypes(include=['str']).columns
 cat_col
 
 # Convert categorical variables to numeric using label encoding
@@ -57,7 +57,7 @@ for col in cat_col:
     print((heart_df[col].unique()), list(range(heart_df[col].nunique())))
     
     # Replace categorical values with sequential integers
-    heart_df[col].replace(heart_df[col].unique(), list(range(heart_df[col].nunique())), inplace=True)
+    heart_df[col] = heart_df[col].replace(heart_df[col].unique(), list(range(heart_df[col].nunique())))
     print('*' * 90)
     print()
 
@@ -71,7 +71,7 @@ heart_df
 heart_df['Cholesterol'].value_counts()
 
 # Replace zero values with NaN to mark as missing
-heart_df['Cholesterol'].replace(0, np.nan, inplace=True)
+heart_df['Cholesterol'] = heart_df['Cholesterol'].replace(0, np.nan)
 
 # Initialize K-Nearest Neighbors imputer (k=3)
 # KNN imputation estimates missing values based on 3 most similar patients
@@ -89,7 +89,7 @@ heart_df['Cholesterol'].isna().sum()
 heart_df['RestingBP'][heart_df['RestingBP'] == 0]
 
 # Replace zero values with NaN
-heart_df['RestingBP'].replace(0, np.nan, inplace=True)
+heart_df['RestingBP'] = heart_df['RestingBP'].replace(0, np.nan)
 
 # Initialize second KNN imputer for blood pressure
 imputer2 = KNNImputer(n_neighbors=3)
