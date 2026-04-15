@@ -1,9 +1,14 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 from sklearn.impute import KNNImputer
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
+from sklearn.metrics import roc_curve
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import ConfusionMatrixDisplay
+import shap
 
 # ========================= DATA LOADING =========================
 
@@ -136,30 +141,8 @@ X_train, X_test, y_train, y_test = train_test_split(
 # Logistic Regression: Linear model that estimates probability of binary outcomes
 # Uses sigmoid function to map linear combination of features to [0,1] probability range
 
-# -------------------- Solver Optimization --------------------
-# Different optimization algorithms have varying convergence properties
-# Test all available solvers to find the most effective for this dataset
-solver = ['lbfgs', 'liblinear', 'newton-cg', 'newton-cholesky', 'sag', 'saga']
-best_solver = ''
-test_score = np.zeros(6)
-
-for i, n in enumerate(solver):
-    # Initialize model with current solver
-    log_reg = LogisticRegression(solver=n, max_iter=1000)
-    
-    # Train model on training data
-    log_reg.fit(X_train, y_train)
-    
-    # Evaluate performance on held-out test set
-    test_score[i] = log_reg.score(X_test, y_test)
-    
-    # Track solver with highest test accuracy
-    if log_reg.score(X_test, y_test) == test_score.max():
-        best_solver = n
-
-# -------------------- Final Model Training --------------------
-# Train final logistic regression model using optimal solver
-log_reg = LogisticRegression(solver=best_solver)
+# Train final logistic regression model
+log_reg = LogisticRegression(max_iter=1000)
 log_reg.fit(X_train, y_train)
 
 # Generate predictions on test set
@@ -168,7 +151,28 @@ log_reg_pred = log_reg.predict(X_test)
 # Calculate and convert accuracy to percentage
 lr_acc = accuracy_score(y_test, log_reg_pred) * 100
 
-# Display training results
-print(f"Best Logistic Regression Solver: {best_solver}")
-print(f'Logistic Regression Accuracy: {accuracy_score(y_test, log_reg_pred):.4f}')
+# Display accuracy of logistic regression model
 print(f"LR Accuracy: {lr_acc:.2f}%")
+
+# Display ROC curve for logistic regression model
+fpr, tpr, thresholds = roc_curve(y_test, log_reg.predict_proba(X_test)[:, 1])
+plt.plot(fpr, tpr, label='Logistic Regression')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('ROC Curve')
+plt.legend()
+
+# Generate the matrix
+cm = confusion_matrix(y_test, log_reg_pred)
+
+# Visualize it
+disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=['Healthy', 'Heart Disease'])
+disp.plot(cmap=plt.cm.Blues)
+plt.show()
+
+# Feature importance analysis using SHAP values
+explainer = shap.Explainer(log_reg, X_train)
+shap_values = explainer(X_test)
+
+# Summary plot
+shap.summary_plot(shap_values, X_test)
