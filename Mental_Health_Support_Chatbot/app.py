@@ -6,7 +6,7 @@ st.write("I'm here to listen. How are you feeling today?")
 
 @st.cache_resource
 def load_chatbot():
-    return pipeline("text-generation", model="./final_model", tokenizer="./final_model")
+    return pipeline("text-generation", model="./empathetic-chatbot/final_model", tokenizer="./empathetic-chatbot/final_model")
 
 generator = load_chatbot()
 
