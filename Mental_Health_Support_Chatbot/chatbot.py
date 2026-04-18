@@ -40,7 +40,7 @@ training_args = TrainingArguments(
     eval_strategy="epoch",
     learning_rate=5e-5,
     weight_decay=0.01,
-    per_device_train_batch_size=16,
+    per_device_train_batch_size=64,
     num_train_epochs=3,
     fp16=True,
     save_strategy="no",
@@ -54,7 +54,7 @@ trainer = Trainer(
     eval_dataset=tokenized_dataset["validation"],
 )
 
-print("Starting training... This might take a while.")
+print("Starting training...")
 trainer.train()
 
 model.save_pretrained("./final_model")
