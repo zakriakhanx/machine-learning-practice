@@ -1,79 +1,68 @@
-# General Health Query Chatbot
+# Health Query Chatbot
 
-A chatbot that answers general health-related questions using OpenAI GPT-3.5 with prompt engineering and safety filters.
+An AI-powered chatbot for answering general health-related questions with built-in safety guardrails.
 
-## Features
+## Overview
 
-- **Prompt Engineering**: Friendly medical assistant persona
-- **Safety Filters**: Blocks diagnosis, prescription, and dangerous requests
-- **Disclaimer**: All responses include health disclaimer
-- **Simple CLI**: Easy-to-use conversational interface
+This chatbot provides general health information while maintaining multiple safety guardrails:
+- Emergency detection - redirects to emergency services
+- Dangerous request filtering - blocks self-harm/crisis content
+- Diagnosis prevention - refuses to provide medical diagnoses
+- Prescription prevention - refuses to prescribe medication
+- Mandatory disclaimers on all responses
 
 ## Requirements
 
 - Python 3.8+
-- OpenAI API key
+- OpenAI Python library
+- python-dotenv
 
-## Setup
+Install dependencies:
+```bash
+pip install openai python-dotenv
+```
 
-1. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
+## Configuration
 
-2. Create `.env` file:
-   ```
-   cp .env.example .env
-   ```
+Create a `.env` file in this directory with your OpenRouter API key:
 
-3. Add your OpenAI API key to `.env`:
-   ```
-   OPENAI_API_KEY=your_api_key_here
-   ```
+```
+OPENROUTER_API_KEY=your_api_key_here
+```
 
-   Get your API key from: https://platform.openai.com/api-keys
+Get a free API key from [OpenRouter](https://openrouter.ai/).
 
 ## Usage
 
 Run the chatbot:
-```
+```bash
 python chatbot.py
 ```
 
-### Example Queries
+Type your health questions when prompted. The chatbot will:
+1. Screen your query through safety filters
+2. If safe, generate a response using the LLM
+3. Append a disclaimer reminding you to consult healthcare professionals
 
-**Allowed:**
-- "What causes a sore throat?"
-- "Is paracetamol safe for children?"
-- "What are the symptoms of flu?"
-
-**Blocked:**
-- "Do I have COVID?"
-- "Prescribe me antibiotics"
-- "What dosage of medicine should I take?"
+Type `quit`, `exit`, or `bye` to end the conversation.
 
 ## Project Structure
 
-```
-├── config.py              # Configuration
-├── llm_client.py          # OpenAI API client
-├── safety_filter.py       # Safety filters
-├── chatbot.py            # Main application
-├── requirements.txt      # Dependencies
-├── .env.example          # API key template
-└── README.md            # This file
-```
+- `chatbot.py` - Main chatbot logic and CLI loop
+- `llm_client.py` - LLM API communication via OpenRouter
+- `safety_filter.py` - Query safety screening
+- `config.py` - Configuration and API settings
+- `.env` - API key storage
 
-## Safety Guidelines
+## Safety Features
 
-This chatbot includes safety filters that block:
-- Medical diagnosis requests
-- Prescription/medication recommendations
-- Specific dosage advice
-- Self-harm or dangerous content
-
-All responses include a disclaimer: "I am an AI assistant providing general health information only. This is not medical advice. Always consult a qualified healthcare professional."
+| Category | Action |
+|----------|--------|
+| Medical Emergency | Directs to call 911 / emergency services |
+| Crisis/Self-Harm | Directs to 988 Crisis Lifeline |
+| Diagnosis Request | Recommends consulting a doctor |
+| Prescription Request | Recommends consulting a doctor/pharmacist |
 
 ## Disclaimer
 
-This is for educational purposes only. Always consult a healthcare professional for medical advice.
+This chatbot provides general health information only. It is **not** a substitute for professional medical advice, diagnosis, or treatment. Always consult qualified healthcare professionals for medical guidance.
