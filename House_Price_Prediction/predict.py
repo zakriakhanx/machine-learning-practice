@@ -1,6 +1,6 @@
 """
 House Price Prediction Model
-=============================
+============================
 This script builds a Linear Regression model to predict house prices using the Housing.csv dataset.
 It includes data preprocessing, model training, evaluation, and visualization.
 """
@@ -14,8 +14,9 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.preprocessing import StandardScaler
 
 # =============================================================================
-# DATA LOADING AND EXPLORATION
+# STEP 1: Data Loading and Exploration
 # =============================================================================
+# Load and inspect the housing dataset to understand its structure and quality.
 
 # Load the housing dataset from CSV file
 housing_data = pd.read_csv('./Housing.csv')
@@ -39,71 +40,77 @@ housing_data.duplicated().sum()
 housing_data.nunique()
 
 # =============================================================================
-# DATA PREPROCESSING
+# STEP 2: Data Preprocessing
 # =============================================================================
+# Transform categorical variables into numeric format suitable for regression.
 
-# Convert categorical variables to dummy/indicator variables
-# drop_first=True avoids multicollinearity by removing the first category
-# dtype=int converts boolean columns to integers (0/1)
+# Convert categorical variables to dummy/indicator variables (one-hot encoding)
+# drop_first=True removes multicollinearity by dropping the first category
+# dtype=int converts boolean columns to integers (0/1) for numerical stability
 housing_data = pd.get_dummies(housing_data, drop_first=True, dtype=int)
 
 # Display the transformed data
 print(housing_data.head())
 
 # =============================================================================
-# FEATURE AND TARGET SEPARATION
+# STEP 3: Feature and Target Separation
 # =============================================================================
+# Separate the dataset into features (X) and target variable (y).
 
-# Separate features (X) from the target variable (price)
+# Features (X): All columns except the target variable 'price'
 X = housing_data.drop('price', axis=1)
+
+# Target (y): The house price we want to predict
 y = housing_data['price']
 
 # =============================================================================
-# TRAIN-TEST SPLIT
+# STEP 4: Train-Test Split
 # =============================================================================
+# Split data into training (80%) and testing (20%) sets for model validation.
 
-# Split data into training (80%) and testing (20%) sets
-# random_state=42 ensures reproducibility of the split
 X_train, X_test, y_train, y_test = train_test_split(
     X, 
     y, 
-    test_size=0.2,
-    random_state=42
+    test_size=0.2,     # 20% of data reserved for testing
+    random_state=42   # Seed for reproducible results
 )
 
 # =============================================================================
-# FEATURE SCALING
+# STEP 5: Feature Scaling
 # =============================================================================
+# Standardize features to have zero mean and unit variance.
+# This ensures all features contribute equally and helps gradient descent converge faster.
 
-# Standardize features by removing the mean and scaling to unit variance
-# This helps linear regression converge faster and perform better
 scaler = StandardScaler()
-X_train_scaled = scaler.fit_transform(X_train)  # Fit scaler on training data
-X_test_scaled = scaler.transform(X_test)        # Apply to test data
+X_train_scaled = scaler.fit_transform(X_train)  # Fit and transform on training data
+X_test_scaled = scaler.transform(X_test)        # Only transform test data (no data leakage)
 
 # =============================================================================
-# MODEL TRAINING
+# STEP 6: Model Training
 # =============================================================================
+# Train a Linear Regression model to learn the relationship between features and price.
 
-# Initialize and train a Linear Regression model
 model = LinearRegression()
 model.fit(X_train_scaled, y_train)
 
 # =============================================================================
-# PREDICTION
+# STEP 7: Prediction
 # =============================================================================
+# Generate predictions on the test set using the trained model.
 
-# Generate predictions on the test set
 y_pred = model.predict(X_test_scaled)
 
 # =============================================================================
-# MODEL EVALUATION
+# STEP 8: Model Evaluation
 # =============================================================================
+# Evaluate model performance using standard regression metrics.
 
-# Calculate Mean Absolute Error (MAE) - average absolute difference between actual and predicted
+# Mean Absolute Error (MAE): Average absolute difference between actual and predicted
+# Interpretable in the same units as the target variable (e.g., dollars)
 mae = mean_absolute_error(y_test, y_pred)
 
-# Calculate Root Mean Squared Error (RMSE) - penalizes larger errors more heavily
+# Root Mean Squared Error (RMSE): Square root of average squared errors
+# Penalizes larger errors more heavily than MAE
 rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 
 # Print evaluation metrics
@@ -111,14 +118,14 @@ print(f"Mean Absolute Error (MAE): {mae:.2f}")
 print(f"Root Mean Squared Error (RMSE): {rmse:.2f}")
 
 # =============================================================================
-# VISUALIZATION
+# STEP 9: Visualization
 # =============================================================================
+# Plot actual vs predicted prices to visually assess model performance.
 
-# Create scatter plot comparing actual vs predicted prices
 plt.figure(figsize=(10, 6))
 plt.scatter(y_test, y_pred, alpha=0.5, color='blue')
 
-# Add a diagonal reference line (perfect prediction line)
+# Add diagonal reference line (perfect prediction line where actual = predicted)
 plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2)
 
 # Label axes and add title
